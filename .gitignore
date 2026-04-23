@@ -1,0 +1,19 @@
+# Бэкенд
+arthub-backend/uploads/*
+!arthub-backend/uploads/.gitkeep
+
+# Фронтенд
+arthub-frontend/node_modules/
+arthub-frontend/dist/
+
+# Docker
+pgdata/
+
+# Go
+arthub-backend/arthub-server
+
+# Системное
+.env
+.DS_Store
+Thumbs.db
+*.log

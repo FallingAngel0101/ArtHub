@@ -1,0 +1,30 @@
+# Этап 1: Сборка Go
+FROM golang:1.23-alpine AS builder
+
+WORKDIR /app
+
+# Копируем go.mod и go.sum
+COPY arthub-backend/go.mod arthub-backend/go.sum ./
+RUN go mod download
+
+# Копируем весь код
+COPY arthub-backend/ ./
+
+# Собираем бинарник
+# Добавляем -checklinkname=0 для совместимости с новыми пакетами
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-checklinkname=0" -o arthub-server .
+
+# Этап 2: Финальный образ
+FROM alpine:latest
+
+WORKDIR /app
+
+# Копируем бинарник из первого этапа
+COPY --from=builder /app/arthub-server .
+COPY --from=builder /app/uploads ./uploads
+
+# Открываем порт
+EXPOSE 8080
+
+# Запускаем
+CMD ["./arthub-server"]
