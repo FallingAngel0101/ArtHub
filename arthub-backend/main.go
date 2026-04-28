@@ -50,10 +50,11 @@ func main() {
 	api.HandleFunc("/artworks/{id}", handlers.DeleteArtwork).Methods("DELETE")
 	api.HandleFunc("/artworks/{id}/publish", handlers.PublishArtwork).Methods("POST")
 
-	// Запросы на выставку
-	api.HandleFunc("/exhibitions/{id}/request", handlers.RequestArtworkForExhibition).Methods("POST") // Галерея запрашивает
-	api.HandleFunc("/requests", handlers.GetMyRequests).Methods("GET")                                // Художник видит входящие
-	api.HandleFunc("/requests/{id}/respond", handlers.RespondToRequest).Methods("POST")               // Художник отвечает
+	// Заявки на выставку
+	api.HandleFunc("/exhibitions/{id}/apply", handlers.ApplyForExhibition).Methods("POST")          // Художник подаёт заявку
+	api.HandleFunc("/gallery/requests", handlers.GetGalleryRequests).Methods("GET")                 // Галерея видит заявки
+	api.HandleFunc("/gallery/requests/{id}/respond", handlers.RespondToApplication).Methods("POST") // Галерея отвечает
+	api.HandleFunc("/my-applications", handlers.GetArtistApplications).Methods("GET")               // Художник видит свои заявки             // Художник отвечает
 	// Выставки (управление)
 	api.HandleFunc("/exhibitions", handlers.CreateExhibition).Methods("POST")                                         // Создать (только галерея)
 	api.HandleFunc("/exhibitions/{id}", handlers.UpdateExhibition).Methods("PUT")                                     // Обновить (только владелец)

@@ -51,7 +51,7 @@ export default function Exhibitions() {
                 }}>
                   {ex.status === 'active' ? 'Активна' : ex.status === 'finished' ? 'Завершена' : 'Планируется'}
                 </span>
-                <Link to={`/exhibition/${ex.id}`} className="btn" style={{ marginTop: '12px', width: '100%', textAlign: 'center' }}>
+                <Link to={`/exhibitions/${ex.id}`} className="btn" style={{ marginTop: '12px', width: '100%', textAlign: 'center' }}>
                   Подробнее
                 </Link>
               </div>

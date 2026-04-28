@@ -83,19 +83,15 @@ type Document struct {
 type ExhibitionRequest struct {
 	ID        uint      `gorm:"primaryKey" json:"id"`
 	CreatedAt time.Time `json:"created_at"`
-	UpdateAt  time.Time `json:"update_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 
-	ExhibitionID uint       `gorm:"not null;index" json:"exhibition_id"`
-	Exhibition   Exhibition `gorm:"foreignKey:ExhibitionID" json:"exhibition,omitempty"`
-	ArtworkID    uint       `gorm:"not null;index" json:"artwork_id"`
-	Artwork      Artwork    `gorm:"foreignKey:ArtworkID" json:"artwork,omitempty"`
-	ArtistID     uint       `gorm:"not null;index" json:"artist_id"`
-
-	GalleryID uint `gorm:"not null;index" json:"gallery_id"`
-
-	Status string `gorm:"size:20;default:'pending'" json:"status"`
-
-	Message string `gorm:"type:text" json:"message"`
-
-	ProposedPrice float64 `json:"proposed_price"`
+	ExhibitionID  uint       `gorm:"not null;index" json:"exhibition_id"`
+	Exhibition    Exhibition `gorm:"foreignKey:ExhibitionID" json:"exhibition,omitempty"`
+	ArtworkID     uint       `gorm:"not null;index" json:"artwork_id"`
+	Artwork       Artwork    `gorm:"foreignKey:ArtworkID" json:"artwork,omitempty"`
+	ArtistID      uint       `gorm:"not null;index" json:"artist_id"`
+	GalleryID     uint       `gorm:"not null;index" json:"gallery_id"`
+	Status        string     `gorm:"size:20;default:'pending'" json:"status"` // pending, accepted, rejected
+	Message       string     `gorm:"type:text" json:"message"`
+	ProposedPrice float64    `json:"proposed_price"`
 }

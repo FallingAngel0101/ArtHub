@@ -53,9 +53,14 @@ export default function Navbar() {
 
               {/* Галерея */}
               {userRole === "gallery" && (
-                <Link to="/gallery" className="nav-link">
-                  🏛️ Мои выставки
-                </Link>
+                <>
+                  <Link to="/gallery" className="nav-link">
+                    🏛️ Мои выставки
+                  </Link>
+                  <Link to="/gallery/requests" className="nav-link">
+                    📩 Заявки
+                  </Link>
+                </>
               )}
 
               {/* Коллекционер */}

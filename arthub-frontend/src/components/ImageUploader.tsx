@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 interface Props {
   onUpload: (url: string) => void;
@@ -8,28 +8,49 @@ interface Props {
 export default function ImageUploader({ onUpload, currentImage }: Props) {
   const [preview, setPreview] = useState<string | null>(currentImage || null);
   const [uploading, setUploading] = useState(false);
+  const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  // При загрузке existing URL — определяем пропорции
+  useEffect(() => {
+    if (currentImage) {
+      const img = new Image();
+      img.onload = () => {
+        setImageSize({ width: img.naturalWidth, height: img.naturalHeight });
+      };
+      img.src = currentImage;
+    }
+  }, [currentImage]);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Проверяем размер (10MB)
     if (file.size > 10 * 1024 * 1024) {
       alert('Файл слишком большой. Максимум 10MB');
       return;
     }
 
-    // Проверяем тип
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     if (!allowedTypes.includes(file.type)) {
       alert('Неподдерживаемый формат. Разрешены: JPG, PNG, WEBP, GIF');
       return;
     }
 
-    // Превью
+    // Показываем превью и определяем размеры
     const reader = new FileReader();
-    reader.onload = (e) => setPreview(e.target?.result as string);
+    reader.onload = (e) => {
+      const url = e.target?.result as string;
+      setPreview(url);
+      
+      // Узнаём реальные размеры
+      const img = new Image();
+      img.onload = () => {
+        setImageSize({ width: img.naturalWidth, height: img.naturalHeight });
+      };
+      img.src = url;
+    };
     reader.readAsDataURL(file);
 
     // Загружаем на сервер
@@ -39,7 +60,7 @@ export default function ImageUploader({ onUpload, currentImage }: Props) {
       formData.append('image', file);
 
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8080/api/upload', {
+      const response = await fetch('/api/upload', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -61,45 +82,54 @@ export default function ImageUploader({ onUpload, currentImage }: Props) {
 
   const handleRemove = () => {
     setPreview(null);
+    setImageSize(null);
     onUpload('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
+  // Рассчитываем пропорции контейнера
+  const containerStyle: React.CSSProperties = preview && imageSize
+    ? {
+        width: '100%',
+        maxWidth: '600px',
+        aspectRatio: `${imageSize.width} / ${imageSize.height}`,
+        maxHeight: '400px',
+      }
+    : {
+        width: '100%',
+        height: '240px',
+      };
+
   return (
     <div>
       <div
+        className={`upload-zone ${preview ? 'has-image' : ''}`}
         onClick={() => fileInputRef.current?.click()}
-        style={{
-          width: '100%',
-          height: '200px',
-          border: '2px dashed #ddd',
-          borderRadius: '8px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          overflow: 'hidden',
-          background: '#f9f9f9',
-          transition: 'border-color 0.2s',
-          position: 'relative'
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#007bff')}
-        onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#ddd')}
+        style={containerStyle}
       >
         {uploading ? (
-          <p>Загрузка...</p>
+          <div style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
+            <div style={{ fontSize: '32px', marginBottom: '8px' }}>⏳</div>
+            <p>Загрузка...</p>
+          </div>
         ) : preview ? (
           <img
+            ref={imgRef}
             src={preview}
             alt="Preview"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',  // ← было 'cover', стало 'contain'
+              borderRadius: 'var(--radius)',
+            }}
           />
         ) : (
-          <div style={{ textAlign: 'center', color: '#999' }}>
+          <div style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
             <p style={{ fontSize: '40px', marginBottom: '8px' }}>🖼️</p>
-            <p>Нажмите для загрузки изображения</p>
+            <p style={{ fontWeight: 600, marginBottom: '4px' }}>Нажмите для загрузки</p>
             <p style={{ fontSize: '12px' }}>JPG, PNG, WEBP, GIF до 10MB</p>
           </div>
         )}
@@ -118,7 +148,7 @@ export default function ImageUploader({ onUpload, currentImage }: Props) {
           type="button"
           onClick={handleRemove}
           className="btn btn-danger"
-          style={{ marginTop: '8px', width: '100%' }}
+          style={{ marginTop: '12px', width: '100%' }}
         >
           Удалить изображение
         </button>

@@ -1,6 +1,7 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Catalog from "./pages/Catalog";
@@ -16,22 +17,39 @@ import GalleryDashboard from "./pages/GalleryDashboard";
 import CreateExhibition from "./pages/CreateExhibition";
 import ExhibitionManage from "./pages/ExhibitionManage";
 import ArtistRequests from "./pages/Artist.Requests";
+import ApplyExhibition from "./pages/ApplyExhibition";
+import GalleryRequests from "./pages/GalleryRequests";
+function AppContent() {
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
 
-function App() {
   return (
-    <BrowserRouter>
-      <Navbar />
+    <>
+      {!isHomePage && <Navbar />}
       <Routes>
-        <Route path="/" element={<Catalog />} />
+        <Route path="/" element={<Home />} />
         <Route path="/catalog" element={<Catalog />} />
         <Route path="/artwork/:id" element={<ArtworkDetail />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/exhibitions" element={<Exhibitions />} />
-        
-        {/* Публичный просмотр выставки (для всех) */}
         <Route path="/exhibitions/:id" element={<ExhibitionDetail />} />
-        
+        <Route
+          path="/apply/:id"
+          element={
+            <ProtectedRoute allowedRoles={["artist"]}>
+              <ApplyExhibition />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/gallery/requests"
+          element={
+            <ProtectedRoute allowedRoles={["gallery"]}>
+              <GalleryRequests />
+            </ProtectedRoute>
+          }
+        />
         {/* Управление выставкой (только для галереи) */}
         <Route
           path="/gallery/exhibitions/:id"
@@ -41,7 +59,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/requests"
           element={
@@ -107,6 +125,14 @@ function App() {
           }
         />
       </Routes>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   );
 }

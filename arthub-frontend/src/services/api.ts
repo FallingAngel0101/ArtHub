@@ -10,7 +10,9 @@ import type {
   SignDocumentResponse 
 } from '../types';
 
-const API_URL = '/api';
+const API_URL = window.location.port === '5173' 
+  ? 'http://localhost:8080/api'  
+  : '/api';   
 
 const api = axios.create({
   baseURL: API_URL,
@@ -22,6 +24,8 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  config.headers['Cache-Control'] = 'no-cache';
+  config.headers['Pragma'] = 'no-cache';
   return config;
 });
 
