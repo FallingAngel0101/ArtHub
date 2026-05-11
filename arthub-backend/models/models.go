@@ -13,9 +13,9 @@ type User struct {
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
 	Email    string `gorm:"uniqueIndex;size:100;not null" json:"email"`
-	Password string `gorm:"not null" json:"-"` // никогда не отдаем пароль
+	Password string `gorm:"not null" json:"-"`
 	Name     string `gorm:"size:100;not null" json:"name"`
-	Role     string `gorm:"size:20;not null;default:'artist'" json:"role"` // artist, gallery, collector, visitor
+	Role     string `gorm:"size:20;not null;default:'artist'" json:"role"`
 }
 
 type Artwork struct {
@@ -34,8 +34,8 @@ type Artwork struct {
 	Height       float64 `json:"height"`
 	BasePrice    float64 `gorm:"not null" json:"base_price"`
 	CurrentPrice float64 `json:"current_price"`
-	Status       string  `gorm:"size:20;default:'draft'" json:"status"` // draft, published, sold, rented
-	ImageURL     string  `gorm:"size:500" json:"image_url"`             // пока заглушка
+	Status       string  `gorm:"size:20;default:'draft'" json:"status"`
+	ImageURL     string  `gorm:"size:500" json:"image_url"`
 }
 
 type Exhibition struct {
@@ -51,7 +51,7 @@ type Exhibition struct {
 	StartDate   time.Time `json:"start_date"`
 	EndDate     time.Time `json:"end_date"`
 	Location    string    `gorm:"size:300" json:"location"`
-	Status      string    `gorm:"size:20;default:'planned'" json:"status"` // planned, active, finished
+	Status      string    `gorm:"size:20;default:'planned'" json:"status"`
 }
 
 type ExhibitionArtwork struct {
@@ -63,8 +63,8 @@ type ExhibitionArtwork struct {
 type HistoryLog struct {
 	ID        uint      `gorm:"primaryKey" json:"id"`
 	ArtworkID uint      `gorm:"not null;index" json:"artwork_id"`
-	EventType string    `gorm:"size:50;not null" json:"event_type"` // exhibition, sale
-	EventID   uint      `json:"event_id"`                           // id выставки или сделки
+	EventType string    `gorm:"size:50;not null" json:"event_type"`
+	EventID   uint      `json:"event_id"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
@@ -73,12 +73,12 @@ type Document struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 
-	Type              string `gorm:"size:50;not null" json:"type"` // contract, act, invoice
-	Data              string `gorm:"type:json" json:"data"`        // JSON с данными документа
+	Type              string `gorm:"size:50;not null" json:"type"`
+	Data              string `gorm:"type:json" json:"data"`
 	SignedByArtist    bool   `gorm:"default:false" json:"signed_by_artist"`
 	SignedByGallery   bool   `gorm:"default:false" json:"signed_by_gallery"`
 	SignedByCollector bool   `gorm:"default:false" json:"signed_by_collector"`
-	Status            string `gorm:"size:20;default:'draft'" json:"status"` // draft, signed, archived
+	Status            string `gorm:"size:20;default:'draft'" json:"status"`
 }
 type ExhibitionRequest struct {
 	ID        uint      `gorm:"primaryKey" json:"id"`
@@ -91,7 +91,17 @@ type ExhibitionRequest struct {
 	Artwork       Artwork    `gorm:"foreignKey:ArtworkID" json:"artwork,omitempty"`
 	ArtistID      uint       `gorm:"not null;index" json:"artist_id"`
 	GalleryID     uint       `gorm:"not null;index" json:"gallery_id"`
-	Status        string     `gorm:"size:20;default:'pending'" json:"status"` // pending, accepted, rejected
+	Status        string     `gorm:"size:20;default:'pending'" json:"status"`
 	Message       string     `gorm:"type:text" json:"message"`
 	ProposedPrice float64    `json:"proposed_price"`
+}
+
+type Message struct {
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+
+	RequestID uint              `gorm:"not null;index" json:"request_id"`
+	Request   ExhibitionRequest `gorm:"foreignKey:RequestID" json:"-"`
+	SenderID  uint              `gorm:"not null" json:"sender_id"`
+	Text      string            `gorm:"type:text;not null" json:"text"`
 }

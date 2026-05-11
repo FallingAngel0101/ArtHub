@@ -41,15 +41,19 @@ export interface AuthResponse {
 }
 export interface ExhibitionRequest {
   id: number;
+  created_at: string;
+  updated_at: string;
   exhibition_id: number;
+  exhibition?: Exhibition;
   artwork_id: number;
+  artwork?: Artwork;
   artist_id: number;
   gallery_id: number;
   status: 'pending' | 'accepted' | 'rejected';
   message: string;
   proposed_price: number;
-  exhibition?: Exhibition;
-  artwork?: Artwork;
+  reject_reason: string;
+  feedback: string;
 }
 
 export interface Exhibition {
@@ -61,7 +65,7 @@ export interface Exhibition {
   start_date: string;
   end_date: string;
   location: string;
-  status: 'planned' | 'active' | 'finished';
+  status: "planned" | "active" | "finished";
   created_at: string;
 }
 
@@ -72,7 +76,7 @@ export interface Document {
   signed_by_artist: boolean;
   signed_by_gallery: boolean;
   signed_by_collector: boolean;
-  status: 'draft' | 'signed' | 'archived';
+  status: "draft" | "signed" | "archived";
 }
 
 export interface BuyResponse {
@@ -85,4 +89,11 @@ export interface BuyResponse {
 export interface SignDocumentResponse {
   message: string;
   document: Document;
+}
+export interface Message {
+  id: number;
+  created_at: string;
+  request_id: number;
+  sender_id: number;
+  text: string;
 }

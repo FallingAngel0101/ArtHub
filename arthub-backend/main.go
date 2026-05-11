@@ -44,6 +44,12 @@ func main() {
 	// Мои картины (для художника, включая черновики)
 	api.HandleFunc("/my-artworks", handlers.GetMyArtworks).Methods("GET")
 
+	// Документы и ЭДО
+	api.HandleFunc("/documents/sale/{artwork_id}", handlers.GenerateSaleContract).Methods("POST")
+	api.HandleFunc("/documents/rent/{request_id}", handlers.GenerateRentContract).Methods("POST")
+	api.HandleFunc("/documents/{id}/sign", handlers.SignDocument).Methods("POST")
+	api.HandleFunc("/documents/{id}/download", handlers.DownloadDocument).Methods("GET")
+
 	// Картины (создание/редактирование/удаление)
 	api.HandleFunc("/artworks", handlers.CreateArtwork).Methods("POST")
 	api.HandleFunc("/artworks/{id}", handlers.UpdateArtwork).Methods("PUT")
@@ -69,6 +75,9 @@ func main() {
 	api.HandleFunc("/purchases", handlers.GetMyPurchases).Methods("GET")          // История покупок (коллекционер)
 	api.HandleFunc("/documents/{id}/sign", handlers.SignDocument).Methods("POST") // Подписать документ (имитация КЭП)
 
+	// Чат в заявках
+	api.HandleFunc("/requests/{id}/messages", handlers.GetMessages).Methods("GET")
+	api.HandleFunc("/requests/{id}/messages", handlers.SendMessage).Methods("POST")
 	// ==================== CORS ====================
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:5173"},

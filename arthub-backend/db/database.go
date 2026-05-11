@@ -43,6 +43,7 @@ func InitDB() {
 		&models.ExhibitionRequest{},
 		&models.HistoryLog{},
 		&models.Document{},
+		&models.Message{},
 	)
 	if err != nil {
 		log.Fatal("❌ Migration failed:", err)

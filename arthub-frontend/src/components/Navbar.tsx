@@ -45,7 +45,7 @@ export default function Navbar() {
                   <Link to="/dashboard" className="nav-link">
                     🎨 Мои картины
                   </Link>
-                  <Link to="/requests" className="nav-link">
+                  <Link to="/my-applications" className="nav-link">
                     📩 Запросы
                   </Link>
                 </>

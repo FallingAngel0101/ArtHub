@@ -4,6 +4,7 @@ import (
 	"arthub-backend/db"
 	"arthub-backend/models"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -93,7 +94,9 @@ func GetMyPurchases(w http.ResponseWriter, r *http.Request) {
 }
 
 // SignDocument — POST /api/documents/{id}/sign (имитация КЭП)
+// SignDocument — POST /api/documents/{id}/sign (имитация КЭП)
 func SignDocument(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("userID").(uint)
 	userRole := r.Context().Value("role").(string)
 	params := mux.Vars(r)
 	docID, _ := strconv.Atoi(params["id"])
@@ -104,7 +107,6 @@ func SignDocument(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Имитация подписи в зависимости от роли
 	switch userRole {
 	case "artist":
 		document.SignedByArtist = true
@@ -114,14 +116,24 @@ func SignDocument(w http.ResponseWriter, r *http.Request) {
 		document.SignedByCollector = true
 	}
 
-	// Если все подписали — меняем статус
 	if document.SignedByArtist && document.SignedByGallery && document.SignedByCollector {
 		document.Status = "signed"
 	}
 
 	db.DB.Save(&document)
 
-	w.Header().Set("Content-Type", "application/json")
+	// Отправляем уведомление в чат (если привязан к заявке)
+	var data map[string]interface{}
+	json.Unmarshal([]byte(document.Data), &data)
+	if requestID, ok := data["request_id"].(float64); ok {
+		msg := models.Message{
+			RequestID: uint(requestID),
+			SenderID:  userID,
+			Text:      fmt.Sprintf("📄 Документ подписан стороной: %s", userRole),
+		}
+		db.DB.Create(&msg)
+	}
+
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"message":  "Document signed (simulation)",
 		"document": document,

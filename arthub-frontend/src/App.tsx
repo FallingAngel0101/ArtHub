@@ -16,9 +16,9 @@ import MyPurchases from "./pages/MyPurchases";
 import GalleryDashboard from "./pages/GalleryDashboard";
 import CreateExhibition from "./pages/CreateExhibition";
 import ExhibitionManage from "./pages/ExhibitionManage";
-import ArtistRequests from "./pages/Artist.Requests";
 import ApplyExhibition from "./pages/ApplyExhibition";
 import GalleryRequests from "./pages/GalleryRequests";
+import ArtistApplications from "./pages/ArtistApplications";
 function AppContent() {
   const location = useLocation();
   const isHomePage = location.pathname === "/";
@@ -61,14 +61,6 @@ function AppContent() {
         />
 
         <Route
-          path="/requests"
-          element={
-            <ProtectedRoute allowedRoles={["artist"]}>
-              <ArtistRequests />
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/dashboard"
           element={
             <ProtectedRoute allowedRoles={["artist"]}>
@@ -89,6 +81,14 @@ function AppContent() {
           element={
             <ProtectedRoute allowedRoles={["gallery"]}>
               <CreateExhibition />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-applications"
+          element={
+            <ProtectedRoute allowedRoles={["artist"]}>
+              <ArtistApplications />
             </ProtectedRoute>
           }
         />
